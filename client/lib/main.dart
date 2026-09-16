@@ -11,8 +11,17 @@ import 'package:meshtalk_client/services/transport_manager.dart';
 import 'package:meshtalk_client/services/story_server_service.dart';
 import 'package:provider/provider.dart';
 
+import 'package:meshtalk_client/features/auth/data/repositories/firebase_auth_repository.dart';
+import 'package:meshtalk_client/features/auth/presentation/providers/auth_provider.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // TODO: Add Firebase initialization here when packages are added
+  // await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+  final authRepository = FirebaseAuthRepository();
+  final authProvider = AuthProvider(authRepository);
 
   // Initialize Storage Service & Core Preferences
   final storageService = StorageService();
@@ -44,6 +53,7 @@ void main() async {
   runApp(
     MultiProvider(
       providers: [
+        ChangeNotifierProvider<AuthProvider>.value(value: authProvider),
         ChangeNotifierProvider<StorageService>.value(value: storageService),
         ChangeNotifierProvider<ConnectivityService>.value(value: connectivityService),
         ChangeNotifierProvider<NearbyDeviceService>.value(value: nearbyDeviceService),
@@ -52,22 +62,26 @@ void main() async {
         ChangeNotifierProvider<TransportManager>.value(value: transportManager),
         ChangeNotifierProvider<StoryServerService>.value(value: storyServerService),
       ],
-      child: MeshTalkApp(storageService: storageService),
+      child: MeshTalkApp(
+        storageService: storageService,
+        authProvider: authProvider,
+      ),
     ),
   );
 }
 
 class MeshTalkApp extends StatefulWidget {
   final StorageService storageService;
+  final AuthProvider authProvider;
 
-  const MeshTalkApp({super.key, required this.storageService});
+  const MeshTalkApp({super.key, required this.storageService, required this.authProvider});
 
   @override
   State<MeshTalkApp> createState() => _MeshTalkAppState();
 }
 
 class _MeshTalkAppState extends State<MeshTalkApp> {
-  late final _router = createAppRouter(widget.storageService);
+  late final _router = createAppRouter(widget.storageService, widget.authProvider);
 
   @override
   Widget build(BuildContext context) {
