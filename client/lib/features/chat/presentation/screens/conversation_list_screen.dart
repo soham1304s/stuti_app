@@ -4,6 +4,7 @@ import 'package:meshtalk_client/core/theme/app_theme.dart';
 import 'package:meshtalk_client/features/chat/domain/models/conversation.dart';
 import 'package:meshtalk_client/features/chat/domain/models/message.dart';
 import 'package:meshtalk_client/services/storage_service.dart';
+import 'package:meshtalk_client/services/story_server_service.dart';
 import 'package:provider/provider.dart';
 
 class ConversationListScreen extends StatefulWidget {
@@ -63,16 +64,51 @@ class _ConversationListScreenState extends State<ConversationListScreen> {
             // Stories Row
             SizedBox(
               height: 100,
-              child: ListView(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                children: [
-                  _buildStoryAvatar('Your story', 'Y', true, isSelf: true, isDark: isDark, textColor: textColor),
-                  _buildStoryAvatar('Mike', 'M', true, isDark: isDark, textColor: textColor),
-                  _buildStoryAvatar('Alex Monroe', 'A', false, isDark: isDark, textColor: textColor),
-                  _buildStoryAvatar('Maya Patel', 'M', true, hasEmoji: true, isDark: isDark, textColor: textColor),
-                  _buildStoryAvatar('Emma Brooks', 'E', false, isDark: isDark, textColor: textColor),
-                ],
+              child: Consumer<StoryServerService>(
+                builder: (context, storyService, child) {
+                  final myStory = storyService.myStory;
+                  final peerStories = storyService.peerStories.values.toList();
+                  
+                  return ListView(
+                    scrollDirection: Axis.horizontal,
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          // Allow user to post a story locally (their device becomes the server)
+                          _showPostStoryDialog(context, storyService);
+                        },
+                        child: _buildStoryAvatar(
+                          'Your story', 
+                          'Y', 
+                          myStory != null, 
+                          isSelf: true, 
+                          isDark: isDark, 
+                          textColor: textColor
+                        ),
+                      ),
+                      ...peerStories.map((story) {
+                        return GestureDetector(
+                          onTap: () => _showStoryViewer(context, story),
+                          child: _buildStoryAvatar(
+                            story.authorName, 
+                            story.authorName[0], 
+                            true, 
+                            isDark: isDark, 
+                            textColor: textColor
+                          ),
+                        );
+                      }),
+                      // Mock hardcoded ones if no real ones
+                      if (peerStories.isEmpty) ...[
+                        _buildStoryAvatar('Mike', 'M', true, isDark: isDark, textColor: textColor),
+                        _buildStoryAvatar('Alex Monroe', 'A', false, isDark: isDark, textColor: textColor),
+                        _buildStoryAvatar('Maya Patel', 'M', true, hasEmoji: true, isDark: isDark, textColor: textColor),
+                        _buildStoryAvatar('Emma Brooks', 'E', false, isDark: isDark, textColor: textColor),
+                      ]
+                    ],
+                  );
+                },
               ),
             ),
 
@@ -170,6 +206,95 @@ class _ConversationListScreenState extends State<ConversationListScreen> {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  void _showPostStoryDialog(BuildContext context, StoryServerService service) {
+    final controller = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: Theme.of(context).brightness == Brightness.dark ? AppTheme.darkSurface : Colors.white,
+        title: Text('Post a Status (Local Server)', style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Your phone will act as an HTTP server on port 8081. Nearby devices will fetch this directly from your IP.',
+              style: TextStyle(fontSize: 12, color: Colors.grey.shade500),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: controller,
+              decoration: const InputDecoration(
+                hintText: 'What\'s on your mind?',
+                border: OutlineInputBorder(),
+              ),
+              maxLines: 3,
+              style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+          ElevatedButton(
+            onPressed: () {
+              if (controller.text.trim().isNotEmpty) {
+                final storage = context.read<StorageService>();
+                final name = storage.currentUser?.displayName ?? 'Me';
+                service.postStory(name, controller.text.trim());
+              }
+              Navigator.pop(ctx);
+            },
+            child: const Text('Post (Host locally)'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showStoryViewer(BuildContext context, Story story) {
+    showDialog(
+      context: context,
+      builder: (ctx) => Dialog(
+        backgroundColor: Colors.transparent,
+        child: Container(
+          width: double.infinity,
+          height: 400,
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              colors: [AppTheme.primaryEmerald, AppTheme.meshCyan],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(24),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  CircleAvatar(backgroundColor: Colors.white24, child: Text(story.authorName[0])),
+                  const SizedBox(width: 12),
+                  Text(story.authorName, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18)),
+                ],
+              ),
+              const Spacer(),
+              Text(
+                story.content,
+                style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w600),
+              ),
+              const Spacer(),
+              Text(
+                'Fetched directly from peer via LAN',
+                style: TextStyle(color: Colors.white.withValues(alpha: 0.6), fontSize: 12),
+              ),
+            ],
+          ),
         ),
       ),
     );

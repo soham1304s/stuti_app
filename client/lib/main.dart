@@ -8,6 +8,7 @@ import 'package:meshtalk_client/services/nearby_device_service.dart';
 import 'package:meshtalk_client/services/storage_service.dart';
 import 'package:meshtalk_client/services/sync_service.dart';
 import 'package:meshtalk_client/services/transport_manager.dart';
+import 'package:meshtalk_client/services/story_server_service.dart';
 import 'package:provider/provider.dart';
 
 void main() async {
@@ -20,6 +21,7 @@ void main() async {
   final connectivityService = ConnectivityService();
   final nearbyDeviceService = NearbyDeviceService();
   final encryptionService = EncryptionService();
+  final storyServerService = StoryServerService();
 
   final syncService = SyncService(
     storageService: storageService,
@@ -34,6 +36,11 @@ void main() async {
     syncService: syncService,
   );
 
+  // Start P2P Story Server
+  if (storageService.currentUser != null) {
+    storyServerService.startServer(storageService.currentUser!.displayName);
+  }
+
   runApp(
     MultiProvider(
       providers: [
@@ -43,6 +50,7 @@ void main() async {
         Provider<EncryptionService>.value(value: encryptionService),
         ChangeNotifierProvider<SyncService>.value(value: syncService),
         ChangeNotifierProvider<TransportManager>.value(value: transportManager),
+        ChangeNotifierProvider<StoryServerService>.value(value: storyServerService),
       ],
       child: MeshTalkApp(storageService: storageService),
     ),
