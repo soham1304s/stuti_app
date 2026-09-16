@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:meshtalk_client/features/calls/presentation/screens/calls_list_screen.dart';
 import 'package:go_router/go_router.dart';
 import 'package:meshtalk_client/features/auth/presentation/screens/onboarding_screen.dart';
 import 'package:meshtalk_client/features/calls/presentation/screens/call_screen.dart';
@@ -36,11 +37,7 @@ GoRouter createAppRouter(StorageService storageService) {
           ),
           GoRoute(
             path: '/calls',
-            builder: (context, state) {
-              final name = state.uri.queryParameters['name'] ?? 'Mesh Contact';
-              final type = state.uri.queryParameters['type'] ?? 'audio';
-              return CallScreen(peerName: name, callType: type);
-            },
+            builder: (context, state) => const CallsListScreen(),
           ),
           GoRoute(
             path: '/chats',

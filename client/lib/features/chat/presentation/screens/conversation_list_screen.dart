@@ -18,8 +18,14 @@ class _ConversationListScreenState extends State<ConversationListScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final textColor = theme.colorScheme.onSurface;
+    final cardColor = isDark ? const Color(0xFF1E1E1E) : Colors.grey.shade200;
+    final searchBgColor = isDark ? const Color(0xFF2C2C2E) : Colors.grey.shade300;
+
     return Scaffold(
-      backgroundColor: AppTheme.darkBg,
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -30,12 +36,12 @@ class _ConversationListScreenState extends State<ConversationListScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
+                  Text(
                     'Messages',
                     style: TextStyle(
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                      color: textColor,
                     ),
                   ),
                   Container(
@@ -61,11 +67,11 @@ class _ConversationListScreenState extends State<ConversationListScreen> {
                 scrollDirection: Axis.horizontal,
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 children: [
-                  _buildStoryAvatar('Your story', 'Y', true, isSelf: true),
-                  _buildStoryAvatar('Mike', 'M', true),
-                  _buildStoryAvatar('Alex Monroe', 'A', false),
-                  _buildStoryAvatar('Maya Patel', 'M', true, hasEmoji: true),
-                  _buildStoryAvatar('Emma Brooks', 'E', false),
+                  _buildStoryAvatar('Your story', 'Y', true, isSelf: true, isDark: isDark, textColor: textColor),
+                  _buildStoryAvatar('Mike', 'M', true, isDark: isDark, textColor: textColor),
+                  _buildStoryAvatar('Alex Monroe', 'A', false, isDark: isDark, textColor: textColor),
+                  _buildStoryAvatar('Maya Patel', 'M', true, hasEmoji: true, isDark: isDark, textColor: textColor),
+                  _buildStoryAvatar('Emma Brooks', 'E', false, isDark: isDark, textColor: textColor),
                 ],
               ),
             ),
@@ -78,13 +84,15 @@ class _ConversationListScreenState extends State<ConversationListScreen> {
                   hintText: 'Search',
                   prefixIcon: const Icon(Icons.search, color: Colors.grey),
                   filled: true,
-                  fillColor: const Color(0xFF2C2C2E),
+                  fillColor: searchBgColor,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(20),
                     borderSide: BorderSide.none,
                   ),
                   contentPadding: const EdgeInsets.symmetric(vertical: 0),
+                  hintStyle: const TextStyle(color: Colors.grey),
                 ),
+                style: TextStyle(color: textColor),
                 onChanged: (val) => setState(() => _searchQuery = val),
               ),
             ),
@@ -99,12 +107,18 @@ class _ConversationListScreenState extends State<ConversationListScreen> {
                     message: 'Great idea!',
                     time: '12:34',
                     isActive: true,
+                    textColor: textColor,
+                    cardColor: cardColor,
+                    isDark: isDark,
                   ),
                   _buildMockupTile(
                     name: 'Alex Monroe 📌',
                     message: 'Typing...',
                     time: '12:34',
                     unreadCount: 2,
+                    textColor: textColor,
+                    cardColor: cardColor,
+                    isDark: isDark,
                   ),
                   _buildMockupTile(
                     name: 'Emma Brooks',
@@ -112,30 +126,45 @@ class _ConversationListScreenState extends State<ConversationListScreen> {
                     time: '12:34',
                     unreadCount: 2,
                     hasHeart: true,
+                    textColor: textColor,
+                    cardColor: cardColor,
+                    isDark: isDark,
                   ),
                   _buildMockupTile(
                     name: 'Mom 💬',
                     message: 'Don\'t forget your umbrella, they said it might rain.',
                     time: '12:34',
                     isRead: true,
+                    textColor: textColor,
+                    cardColor: cardColor,
+                    isDark: isDark,
                   ),
                   _buildMockupTile(
                     name: 'Maya Patel 📸',
                     message: 'I\'ll send you the draft tonight, promise',
                     time: '12:34',
                     unreadCount: 1,
+                    textColor: textColor,
+                    cardColor: cardColor,
+                    isDark: isDark,
                   ),
                   _buildMockupTile(
                     name: 'Liam',
                     message: 'Let me know if something needs fixing.',
                     time: '12:34',
                     unreadCount: 1,
+                    textColor: textColor,
+                    cardColor: cardColor,
+                    isDark: isDark,
                   ),
                   _buildMockupTile(
                     name: 'Noah',
                     message: 'Don\'t forget your umbrella they said',
                     time: '12:34',
                     unreadCount: 1,
+                    textColor: textColor,
+                    cardColor: cardColor,
+                    isDark: isDark,
                   ),
                 ],
               ),
@@ -146,7 +175,7 @@ class _ConversationListScreenState extends State<ConversationListScreen> {
     );
   }
 
-  Widget _buildStoryAvatar(String name, String initial, bool hasStory, {bool isSelf = false, bool hasEmoji = false}) {
+  Widget _buildStoryAvatar(String name, String initial, bool hasStory, {bool isSelf = false, bool hasEmoji = false, required bool isDark, required Color textColor}) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8),
       child: Column(
@@ -164,10 +193,10 @@ class _ConversationListScreenState extends State<ConversationListScreen> {
                 ),
                 child: CircleAvatar(
                   radius: 30,
-                  backgroundColor: AppTheme.darkCard,
+                  backgroundColor: isDark ? AppTheme.darkCard : Colors.grey.shade300,
                   child: Text(
                     initial,
-                    style: const TextStyle(fontSize: 24, color: Colors.white),
+                    style: TextStyle(fontSize: 24, color: textColor),
                   ),
                 ),
               ),
@@ -189,7 +218,7 @@ class _ConversationListScreenState extends State<ConversationListScreen> {
           const SizedBox(height: 6),
           Text(
             name,
-            style: const TextStyle(fontSize: 12, color: Colors.white),
+            style: TextStyle(fontSize: 12, color: textColor),
           ),
         ],
       ),
@@ -204,36 +233,39 @@ class _ConversationListScreenState extends State<ConversationListScreen> {
     int unreadCount = 0,
     bool hasHeart = false,
     bool isRead = false,
+    required Color textColor,
+    required Color cardColor,
+    required bool isDark,
   }) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
       decoration: BoxDecoration(
-        color: isActive ? const Color(0xFF1E1E1E) : Colors.transparent,
+        color: isActive ? cardColor : Colors.transparent,
         borderRadius: BorderRadius.circular(16),
       ),
       child: ListTile(
         contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
         leading: CircleAvatar(
           radius: 28,
-          backgroundColor: AppTheme.darkCard,
+          backgroundColor: isDark ? AppTheme.darkCard : Colors.grey.shade300,
           child: Text(
             name.characters.first,
-            style: const TextStyle(fontSize: 20, color: Colors.white),
+            style: TextStyle(fontSize: 20, color: textColor),
           ),
         ),
         title: Text(
           name,
-          style: const TextStyle(
+          style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 16,
-            color: Colors.white,
+            color: textColor,
           ),
         ),
         subtitle: Text(
           message,
           style: TextStyle(
             fontSize: 14,
-            color: (unreadCount > 0 || message == 'Typing...') ? Colors.white : Colors.grey,
+            color: (unreadCount > 0 || message == 'Typing...') ? textColor : Colors.grey,
           ),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,

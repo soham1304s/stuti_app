@@ -68,7 +68,7 @@ class _MeshTalkAppState extends State<MeshTalkApp> {
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
-      themeMode: ThemeMode.dark, // Default to sleek off-grid dark theme
+      themeMode: context.watch<StorageService>().isDarkMode ? ThemeMode.dark : ThemeMode.light,
       routerConfig: _router,
     );
   }

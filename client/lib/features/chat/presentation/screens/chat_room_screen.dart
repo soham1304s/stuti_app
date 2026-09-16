@@ -264,9 +264,9 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
             decoration: BoxDecoration(
-              color: AppTheme.darkSurface,
-              border: const Border(
-                top: BorderSide(color: Color(0xFF334155), width: 0.5),
+              color: Theme.of(context).brightness == Brightness.dark ? AppTheme.darkSurface : Colors.grey.shade100,
+              border: Border(
+                top: BorderSide(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF334155) : Colors.grey.shade300, width: 0.5),
               ),
             ),
             child: SafeArea(
@@ -519,6 +519,10 @@ class _MessageBubble extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final textColor = theme.colorScheme.onSurface;
+
     return Align(
       alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
       child: Container(
@@ -529,8 +533,8 @@ class _MessageBubble extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         decoration: BoxDecoration(
           color: isMe
-              ? const Color(0xFF064E3B) // Dark Emerald Container
-              : AppTheme.darkCard,
+              ? (isDark ? const Color(0xFF5A2500) : Colors.orange.shade100) // Dark Orange Container or light orange
+              : (isDark ? AppTheme.darkCard : Colors.grey.shade200),
           borderRadius: BorderRadius.only(
             topLeft: const Radius.circular(16),
             topRight: const Radius.circular(16),
@@ -540,7 +544,7 @@ class _MessageBubble extends StatelessWidget {
           border: Border.all(
             color: isMe
                 ? AppTheme.primaryEmerald.withValues(alpha: 0.3)
-                : const BorderSide(color: Color(0xFF475569)).color,
+                : (isDark ? const Color(0xFF475569) : Colors.grey.shade300),
             width: 0.8,
           ),
         ),
@@ -585,7 +589,7 @@ class _MessageBubble extends StatelessWidget {
                     height: 18,
                     width: 120,
                     decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.15),
+                      color: isDark ? Colors.white.withValues(alpha: 0.15) : Colors.black.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: Row(
@@ -613,9 +617,9 @@ class _MessageBubble extends StatelessWidget {
             // Content Text
             Text(
               message.content,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 15,
-                color: Colors.white,
+                color: textColor,
                 height: 1.3,
               ),
             ),

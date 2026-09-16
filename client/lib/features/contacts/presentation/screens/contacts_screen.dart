@@ -94,6 +94,11 @@ class _ContactsScreenState extends State<ContactsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final textColor = theme.colorScheme.onSurface;
+    final searchBgColor = isDark ? const Color(0xFF2C2C2E) : Colors.grey.shade300;
+    
     final storage = context.watch<StorageService>();
     final contacts = storage.contacts.where((c) {
       if (_query.isEmpty) return true;
@@ -102,22 +107,58 @@ class _ContactsScreenState extends State<ContactsScreen> {
     }).toList();
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Mesh Contacts'),
-      ),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: TextField(
-              decoration: const InputDecoration(
-                hintText: 'Search verified nodes by name or phone...',
-                prefixIcon: Icon(Icons.search, size: 20),
-                contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      backgroundColor: theme.scaffoldBackgroundColor,
+      body: SafeArea(
+        child: Column(
+          children: [
+            // Custom Header
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'People',
+                    style: TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                      color: textColor,
+                    ),
+                  ),
+                  Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(color: AppTheme.primaryEmerald),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    padding: const EdgeInsets.all(4),
+                    child: const Icon(
+                      Icons.person_add,
+                      color: AppTheme.primaryEmerald,
+                      size: 20,
+                    ),
+                  )
+                ],
               ),
-              onChanged: (val) => setState(() => _query = val),
             ),
-          ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              child: TextField(
+                decoration: InputDecoration(
+                  hintText: 'Search people...',
+                  prefixIcon: const Icon(Icons.search, color: Colors.grey),
+                  filled: true,
+                  fillColor: searchBgColor,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(20),
+                    borderSide: BorderSide.none,
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(vertical: 0),
+                  hintStyle: const TextStyle(color: Colors.grey),
+                ),
+                style: TextStyle(color: textColor),
+                onChanged: (val) => setState(() => _query = val),
+              ),
+            ),
           Expanded(
             child: ListView.separated(
               itemCount: contacts.length,
@@ -203,6 +244,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
             ),
           ),
         ],
+      ),
       ),
     );
   }

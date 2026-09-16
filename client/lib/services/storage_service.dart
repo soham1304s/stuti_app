@@ -15,18 +15,27 @@ class StorageService extends ChangeNotifier {
   final Map<String, List<Message>> _messagesByConversation = {};
   final List<Contact> _contacts = [];
   final Set<String> _seenMessageIds = {};
+  bool _isDarkMode = true;
 
   UserIdentity? get currentUser => _currentUser;
   List<Conversation> get conversations => List.unmodifiable(_conversations);
   List<Contact> get contacts => List.unmodifiable(_contacts);
   Set<String> get seenMessageIds => Set.unmodifiable(_seenMessageIds);
+  bool get isDarkMode => _isDarkMode;
 
   Future<void> initialize() async {
     _prefs = await SharedPreferences.getInstance();
+    _isDarkMode = _prefs?.getBool('isDarkMode') ?? true;
     await _loadUserIdentity();
     await _loadContacts();
     await _loadConversations();
     await _loadSeenMessageIds();
+  }
+
+  Future<void> toggleTheme() async {
+    _isDarkMode = !_isDarkMode;
+    await _prefs?.setBool('isDarkMode', _isDarkMode);
+    notifyListeners();
   }
 
   Future<void> _loadUserIdentity() async {
