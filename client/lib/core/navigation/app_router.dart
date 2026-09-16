@@ -31,20 +31,24 @@ GoRouter createAppRouter(StorageService storageService) {
         builder: (context, state, child) => MainShellScreen(child: child),
         routes: [
           GoRoute(
-            path: '/chats',
-            builder: (context, state) => const ConversationListScreen(),
-          ),
-          GoRoute(
-            path: '/nearby',
-            builder: (context, state) => const NearbyRadarScreen(),
-          ),
-          GoRoute(
             path: '/contacts',
             builder: (context, state) => const ContactsScreen(),
           ),
           GoRoute(
-            path: '/console',
-            builder: (context, state) => const MeshDebugConsoleScreen(),
+            path: '/calls',
+            builder: (context, state) {
+              final name = state.uri.queryParameters['name'] ?? 'Mesh Contact';
+              final type = state.uri.queryParameters['type'] ?? 'audio';
+              return CallScreen(peerName: name, callType: type);
+            },
+          ),
+          GoRoute(
+            path: '/chats',
+            builder: (context, state) => const ConversationListScreen(),
+          ),
+          GoRoute(
+            path: '/settings',
+            builder: (context, state) => const SettingsScreen(),
           ),
         ],
       ),
@@ -59,23 +63,19 @@ GoRouter createAppRouter(StorageService storageService) {
         },
       ),
       GoRoute(
-        path: '/calls',
+        path: '/nearby',
         parentNavigatorKey: _rootNavigatorKey,
-        builder: (context, state) {
-          final name = state.uri.queryParameters['name'] ?? 'Mesh Contact';
-          final type = state.uri.queryParameters['type'] ?? 'audio';
-          return CallScreen(peerName: name, callType: type);
-        },
+        builder: (context, state) => const NearbyRadarScreen(),
+      ),
+      GoRoute(
+        path: '/console',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => const MeshDebugConsoleScreen(),
       ),
       GoRoute(
         path: '/profile',
         parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) => const ProfileScreen(),
-      ),
-      GoRoute(
-        path: '/settings',
-        parentNavigatorKey: _rootNavigatorKey,
-        builder: (context, state) => const SettingsScreen(),
       ),
     ],
   );

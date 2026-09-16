@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:meshtalk_client/core/constants/app_constants.dart';
 import 'package:meshtalk_client/core/theme/app_theme.dart';
-import 'package:meshtalk_client/core/utils/date_formatter.dart';
 import 'package:meshtalk_client/features/chat/domain/models/conversation.dart';
 import 'package:meshtalk_client/features/chat/domain/models/message.dart';
 import 'package:meshtalk_client/services/storage_service.dart';
@@ -20,275 +18,265 @@ class _ConversationListScreenState extends State<ConversationListScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final storage = context.watch<StorageService>();
-    final conversations = storage.conversations.where((c) {
-      if (_searchQuery.isEmpty) return true;
-      return c.title.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-          (c.lastMessage?.content.toLowerCase().contains(_searchQuery.toLowerCase()) ?? false);
-    }).toList();
-
     return Scaffold(
-      appBar: AppBar(
-        title: Row(
+      backgroundColor: AppTheme.darkBg,
+      body: SafeArea(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              padding: const EdgeInsets.all(6),
-              decoration: BoxDecoration(
-                color: AppTheme.primaryEmerald.withValues(alpha: 0.15),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: const Icon(Icons.hub_rounded, color: AppTheme.primaryEmerald, size: 20),
-            ),
-            const SizedBox(width: 10),
-            const Text('MeshTalk'),
-          ],
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.person_outline),
-            tooltip: 'My Node Identity',
-            onPressed: () => context.push('/profile'),
-          ),
-          IconButton(
-            icon: const Icon(Icons.settings_outlined),
-            tooltip: 'Settings',
-            onPressed: () => context.push('/settings'),
-          ),
-        ],
-      ),
-      body: Column(
-        children: [
-          // Search Field
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: TextField(
-              decoration: InputDecoration(
-                hintText: 'Search conversations or messages...',
-                prefixIcon: const Icon(Icons.search, size: 20),
-                suffixIcon: _searchQuery.isNotEmpty
-                    ? IconButton(
-                        icon: const Icon(Icons.clear, size: 18),
-                        onPressed: () => setState(() => _searchQuery = ''),
-                      )
-                    : null,
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-              ),
-              onChanged: (val) => setState(() => _searchQuery = val),
-            ),
-          ),
-
-          // Conversation List
-          Expanded(
-            child: conversations.isEmpty
-                ? Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.chat_bubble_outline,
-                          size: 48,
-                          color: Colors.white.withValues(alpha: 0.3),
-                        ),
-                        const SizedBox(height: 12),
-                        const Text(
-                          'No conversations found',
-                          style: TextStyle(fontSize: 16, color: Color(0xFF94A3B8)),
-                        ),
-                      ],
+            // Custom Header
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'Messages',
+                    style: TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                  Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(color: AppTheme.primaryEmerald),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    padding: const EdgeInsets.all(4),
+                    child: const Icon(
+                      Icons.add,
+                      color: AppTheme.primaryEmerald,
+                      size: 20,
                     ),
                   )
-                : ListView.separated(
-                    itemCount: conversations.length,
-                    separatorBuilder: (ctx, i) => const Divider(height: 1, indent: 72),
-                    itemBuilder: (context, index) {
-                      final conv = conversations[index];
-                      return _ConversationTile(conversation: conv);
-                    },
+                ],
+              ),
+            ),
+
+            // Stories Row
+            SizedBox(
+              height: 100,
+              child: ListView(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                children: [
+                  _buildStoryAvatar('Your story', 'Y', true, isSelf: true),
+                  _buildStoryAvatar('Mike', 'M', true),
+                  _buildStoryAvatar('Alex Monroe', 'A', false),
+                  _buildStoryAvatar('Maya Patel', 'M', true, hasEmoji: true),
+                  _buildStoryAvatar('Emma Brooks', 'E', false),
+                ],
+              ),
+            ),
+
+            // Search Bar
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              child: TextField(
+                decoration: InputDecoration(
+                  hintText: 'Search',
+                  prefixIcon: const Icon(Icons.search, color: Colors.grey),
+                  filled: true,
+                  fillColor: const Color(0xFF2C2C2E),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(20),
+                    borderSide: BorderSide.none,
                   ),
-          ),
-        ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: AppTheme.primaryEmerald,
-        foregroundColor: Colors.black,
-        onPressed: () => context.push('/contacts'),
-        tooltip: 'Start Conversation',
-        child: const Icon(Icons.edit_note_rounded),
+                  contentPadding: const EdgeInsets.symmetric(vertical: 0),
+                ),
+                onChanged: (val) => setState(() => _searchQuery = val),
+              ),
+            ),
+
+            // Chat List
+            Expanded(
+              child: ListView(
+                padding: const EdgeInsets.only(top: 8),
+                children: [
+                  _buildMockupTile(
+                    name: 'Mike',
+                    message: 'Great idea!',
+                    time: '12:34',
+                    isActive: true,
+                  ),
+                  _buildMockupTile(
+                    name: 'Alex Monroe 📌',
+                    message: 'Typing...',
+                    time: '12:34',
+                    unreadCount: 2,
+                  ),
+                  _buildMockupTile(
+                    name: 'Emma Brooks',
+                    message: 'I found that café I told you about everythink',
+                    time: '12:34',
+                    unreadCount: 2,
+                    hasHeart: true,
+                  ),
+                  _buildMockupTile(
+                    name: 'Mom 💬',
+                    message: 'Don\'t forget your umbrella, they said it might rain.',
+                    time: '12:34',
+                    isRead: true,
+                  ),
+                  _buildMockupTile(
+                    name: 'Maya Patel 📸',
+                    message: 'I\'ll send you the draft tonight, promise',
+                    time: '12:34',
+                    unreadCount: 1,
+                  ),
+                  _buildMockupTile(
+                    name: 'Liam',
+                    message: 'Let me know if something needs fixing.',
+                    time: '12:34',
+                    unreadCount: 1,
+                  ),
+                  _buildMockupTile(
+                    name: 'Noah',
+                    message: 'Don\'t forget your umbrella they said',
+                    time: '12:34',
+                    unreadCount: 1,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
-}
 
-class _ConversationTile extends StatelessWidget {
-  final Conversation conversation;
-
-  const _ConversationTile({required this.conversation});
-
-  @override
-  Widget build(BuildContext context) {
-    final lastMsg = conversation.lastMessage;
-
-    Widget buildTransportBadge() {
-      switch (conversation.activeTransport) {
-        case MessageTransport.internet:
-          return Container(
-            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-            decoration: BoxDecoration(
-              color: AppTheme.onlineColor.withValues(alpha: 0.15),
-              borderRadius: BorderRadius.circular(4),
-            ),
-            child: const Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.cloud_outlined, size: 11, color: AppTheme.onlineColor),
-                SizedBox(width: 3),
-                Text(
-                  'Cloud',
-                  style: TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.w600,
-                    color: AppTheme.onlineColor,
-                  ),
-                ),
-              ],
-            ),
-          );
-        case MessageTransport.bluetooth:
-          return Container(
-            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-            decoration: BoxDecoration(
-              color: AppTheme.nearbyMeshColor.withValues(alpha: 0.15),
-              borderRadius: BorderRadius.circular(4),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(Icons.bluetooth, size: 11, color: AppTheme.nearbyMeshColor),
-                const SizedBox(width: 3),
-                Text(
-                  conversation.approximateDistance != null
-                      ? 'BLE (${conversation.approximateDistance})'
-                      : 'BLE',
-                  style: const TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.w600,
-                    color: AppTheme.nearbyMeshColor,
-                  ),
-                ),
-              ],
-            ),
-          );
-        case MessageTransport.meshRelay:
-          return Container(
-            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-            decoration: BoxDecoration(
-              color: AppTheme.meshCyan.withValues(alpha: 0.15),
-              borderRadius: BorderRadius.circular(4),
-            ),
-            child: const Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.alt_route, size: 11, color: AppTheme.meshCyan),
-                SizedBox(width: 3),
-                Text(
-                  'Mesh Relay',
-                  style: TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.w600,
-                    color: AppTheme.meshCyan,
-                  ),
-                ),
-              ],
-            ),
-          );
-      }
-    }
-
-    return ListTile(
-      onTap: () => context.push('/chats/${conversation.id}'),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      leading: Stack(
+  Widget _buildStoryAvatar(String name, String initial, bool hasStory, {bool isSelf = false, bool hasEmoji = false}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8),
+      child: Column(
         children: [
-          CircleAvatar(
-            radius: 26,
-            backgroundColor: AppTheme.darkCard,
-            child: Text(
-              conversation.avatarInitials ?? conversation.title[0],
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w700,
-                color: Colors.white,
-              ),
-            ),
-          ),
-          if (conversation.isNearby)
-            Positioned(
-              right: 0,
-              bottom: 0,
-              child: Container(
-                width: 14,
-                height: 14,
+          Stack(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(2),
                 decoration: BoxDecoration(
-                  color: AppTheme.nearbyMeshColor,
                   shape: BoxShape.circle,
-                  border: Border.all(color: AppTheme.darkBg, width: 2),
-                ),
-              ),
-            ),
-        ],
-      ),
-      title: Row(
-        children: [
-          Expanded(
-            child: Text(
-              conversation.title,
-              style: const TextStyle(
-                fontWeight: FontWeight.w700,
-                fontSize: 16,
-              ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-          if (lastMsg != null)
-            Text(
-              DateFormatter.formatConversationTime(lastMsg.createdAt),
-              style: const TextStyle(fontSize: 12, color: Color(0xFF94A3B8)),
-            ),
-        ],
-      ),
-      subtitle: Row(
-        children: [
-          Expanded(
-            child: Row(
-              children: [
-                if (lastMsg?.mediaType == MessageMediaType.image)
-                  const Padding(
-                    padding: EdgeInsets.only(right: 4),
-                    child: Icon(Icons.image, size: 14, color: Color(0xFF94A3B8)),
+                  border: Border.all(
+                    color: hasStory ? AppTheme.primaryEmerald : Colors.transparent,
+                    width: 2,
                   ),
-                Expanded(
+                ),
+                child: CircleAvatar(
+                  radius: 30,
+                  backgroundColor: AppTheme.darkCard,
                   child: Text(
-                    lastMsg?.content ?? 'No messages yet',
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: conversation.unreadCount > 0
-                          ? Colors.white
-                          : const Color(0xFF94A3B8),
-                      fontWeight: conversation.unreadCount > 0
-                          ? FontWeight.w600
-                          : FontWeight.normal,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+                    initial,
+                    style: const TextStyle(fontSize: 24, color: Colors.white),
                   ),
                 ),
+              ),
+              if (isSelf)
+                Positioned(
+                  bottom: 0,
+                  right: 0,
+                  child: Container(
+                    decoration: const BoxDecoration(
+                      color: AppTheme.primaryEmerald,
+                      shape: BoxShape.circle,
+                    ),
+                    padding: const EdgeInsets.all(4),
+                    child: const Icon(Icons.add, size: 12, color: Colors.white),
+                  ),
+                ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          Text(
+            name,
+            style: const TextStyle(fontSize: 12, color: Colors.white),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMockupTile({
+    required String name,
+    required String message,
+    required String time,
+    bool isActive = false,
+    int unreadCount = 0,
+    bool hasHeart = false,
+    bool isRead = false,
+  }) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
+      decoration: BoxDecoration(
+        color: isActive ? const Color(0xFF1E1E1E) : Colors.transparent,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: ListTile(
+        contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
+        leading: CircleAvatar(
+          radius: 28,
+          backgroundColor: AppTheme.darkCard,
+          child: Text(
+            name.characters.first,
+            style: const TextStyle(fontSize: 20, color: Colors.white),
+          ),
+        ),
+        title: Text(
+          name,
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+            color: Colors.white,
+          ),
+        ),
+        subtitle: Text(
+          message,
+          style: TextStyle(
+            fontSize: 14,
+            color: (unreadCount > 0 || message == 'Typing...') ? Colors.white : Colors.grey,
+          ),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
+        trailing: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            Text(
+              time,
+              style: const TextStyle(fontSize: 12, color: Colors.grey),
+            ),
+            const SizedBox(height: 6),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (hasHeart)
+                  const Padding(
+                    padding: EdgeInsets.only(right: 6),
+                    child: Icon(Icons.favorite, color: AppTheme.primaryEmerald, size: 14),
+                  ),
+                if (isRead)
+                  const Icon(Icons.done_all, color: Colors.grey, size: 16),
+                if (unreadCount > 0)
+                  Container(
+                    padding: const EdgeInsets.all(6),
+                    decoration: const BoxDecoration(
+                      color: AppTheme.primaryEmerald,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Text(
+                      unreadCount.toString(),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
               ],
             ),
-          ),
-          const SizedBox(width: 8),
-          buildTransportBadge(),
-        ],
+          ],
+        ),
       ),
     );
   }

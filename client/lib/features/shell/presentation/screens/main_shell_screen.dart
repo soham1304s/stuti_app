@@ -13,30 +13,26 @@ class MainShellScreen extends StatelessWidget {
 
   int _calculateSelectedIndex(BuildContext context) {
     final location = GoRouterState.of(context).uri.path;
-    if (location.startsWith('/chats')) return 0;
-    if (location.startsWith('/nearby')) return 1;
-    if (location.startsWith('/contacts')) return 2;
-    if (location.startsWith('/calls')) return 3;
-    if (location.startsWith('/console')) return 4;
-    return 0;
+    if (location.startsWith('/contacts')) return 0; // People
+    if (location.startsWith('/calls')) return 1;    // Calls
+    if (location.startsWith('/chats')) return 2;    // Chats
+    if (location.startsWith('/settings')) return 3; // Settings
+    return 2; // Default to Chats
   }
 
   void _onItemTapped(int index, BuildContext context) {
     switch (index) {
       case 0:
-        context.go('/chats');
-        break;
-      case 1:
-        context.go('/nearby');
-        break;
-      case 2:
         context.go('/contacts');
         break;
-      case 3:
+      case 1:
         context.go('/calls');
         break;
-      case 4:
-        context.go('/console');
+      case 2:
+        context.go('/chats');
+        break;
+      case 3:
+        context.go('/settings');
         break;
     }
   }
@@ -238,54 +234,9 @@ class MainShellScreen extends StatelessWidget {
       body: SafeArea(
         child: Column(
           children: [
-            // Dynamic Status Banner
-            Material(
-              color: bannerColor,
-              child: InkWell(
-                onTap: () => _showNetworkSimulatorSheet(context),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
-                  child: Row(
-                    children: [
-                      Icon(bannerIcon, size: 16, color: textColor),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          bannerText,
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            color: textColor,
-                          ),
-                        ),
-                      ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: Colors.black.withValues(alpha: 0.25),
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        child: Row(
-                          children: [
-                            Text(
-                              'SIMULATOR',
-                              style: TextStyle(
-                                fontSize: 10,
-                                fontWeight: FontWeight.w700,
-                                letterSpacing: 0.5,
-                                color: textColor,
-                              ),
-                            ),
-                            const SizedBox(width: 2),
-                            Icon(Icons.tune, size: 12, color: textColor),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
+            // Removed Dynamic Status Banner to match mockup 1:1
+
+
 
             // Main Child View
             Expanded(child: child),
@@ -297,19 +248,9 @@ class MainShellScreen extends StatelessWidget {
         onDestinationSelected: (idx) => _onItemTapped(idx, context),
         destinations: const [
           NavigationDestination(
-            icon: Icon(Icons.chat_bubble_outline),
-            selectedIcon: Icon(Icons.chat_bubble, color: AppTheme.primaryEmerald),
-            label: 'Chats',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.radar_outlined),
-            selectedIcon: Icon(Icons.radar, color: AppTheme.primaryEmerald),
-            label: 'Nearby',
-          ),
-          NavigationDestination(
             icon: Icon(Icons.people_alt_outlined),
             selectedIcon: Icon(Icons.people_alt, color: AppTheme.primaryEmerald),
-            label: 'Contacts',
+            label: 'People',
           ),
           NavigationDestination(
             icon: Icon(Icons.phone_outlined),
@@ -317,9 +258,14 @@ class MainShellScreen extends StatelessWidget {
             label: 'Calls',
           ),
           NavigationDestination(
-            icon: Icon(Icons.terminal_outlined),
-            selectedIcon: Icon(Icons.terminal, color: AppTheme.primaryEmerald),
-            label: 'Console',
+            icon: Icon(Icons.chat_bubble_outline),
+            selectedIcon: Icon(Icons.chat_bubble, color: AppTheme.primaryEmerald),
+            label: 'Chats',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.settings_outlined),
+            selectedIcon: Icon(Icons.settings, color: AppTheme.primaryEmerald),
+            label: 'Settings',
           ),
         ],
       ),

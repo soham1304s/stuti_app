@@ -8,12 +8,13 @@ class AppTheme {
   static const Color offlineColor = Color(0xFF64748B);     // Cool Slate Gray
 
   // Brand Accent Colors
-  static const Color primaryEmerald = Color(0xFF10B981);
-  static const Color primaryDarkEmerald = Color(0xFF047857);
+  static const Color primaryEmerald = Color(0xFFFF6B00); // Changed to Orange for mockup
+  static const Color primaryDarkEmerald = Color(0xFFE65C00);
   static const Color meshCyan = Color(0xFF06B6D4);
-  static const Color darkBg = Color(0xFF0F172A);           // Slate 900
-  static const Color darkSurface = Color(0xFF1E293B);      // Slate 800
-  static const Color darkCard = Color(0xFF334155);         // Slate 700
+  static const Color darkBg = Color(0xFF111111);           // Pitch black-ish
+  static const Color darkSurface = Color(0xFF1C1C1E);      // Darker gray
+  static const Color darkCard = Color(0xFF2C2C2E);         // Slightly lighter
+
 
   // Dark Theme
   static ThemeData get darkTheme {
@@ -59,9 +60,9 @@ class AppTheme {
         ),
       ),
       navigationBarTheme: NavigationBarThemeData(
-        backgroundColor: darkSurface,
-        indicatorColor: primaryEmerald.withValues(alpha: 0.2),
-        elevation: 8,
+        backgroundColor: darkBg,
+        indicatorColor: Colors.transparent,
+        elevation: 0,
         labelTextStyle: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.selected)) {
             return const TextStyle(
