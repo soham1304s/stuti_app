@@ -125,22 +125,18 @@ Drift / SQLite
 
 ## Backend
 
-Recommended:
+Implemented & Recommended Architecture:
 
 ```text
-Node.js
-TypeScript
-NestJS / Fastify
-PostgreSQL
-Redis
-WebSocket
-S3-compatible object storage
+Rust (tokio + axum)
+Stateless WebSocket P2P Signaling Relay
+(No database required for core messaging)
 ```
 
-Alternative backend:
+Alternative cloud-synced backend:
 
 ```text
-Supabase
+Firebase / Supabase (Optional for Authentication & Sync)
 ```
 
 ---
@@ -222,6 +218,10 @@ Device IDs
 ```
 
 This makes secure offline communication possible without requiring a central server during the offline period.
+
+### Optional Cloud Authentication
+While the core messaging is based on pure cryptographic identities, the architecture includes a decoupled **Authentication Wrapper** (e.g. Firebase Auth).
+This allows users to sign in via Google or Apple to link their identities across devices or sync settings, while leaving the core Bluetooth mesh completely independent of the backend login server.
 
 ---
 
@@ -591,6 +591,13 @@ Message editing
 Message deletion
 ```
 
+## 2. Local P2P Stories / Statuses
+
+Users can post temporary status updates ("Stories") completely offline:
+* The poster's device spins up an embedded HTTP Server (acting as the backend).
+* Nearby peers dynamically discover and fetch the JSON/Media payloads directly from the poster's local IP or Bluetooth endpoint.
+* No central database is involved in hosting or serving the status.
+
 ---
 
 # 🖼️ Media Messages
@@ -736,6 +743,8 @@ The home screen can include:
 ---
 
 # 🎨 Application UI
+
+The UI is built to production-grade standards, strictly aligning with iOS-style dark mode aesthetics featuring an orange accent color. It supports dynamic Light/Dark mode toggling on the fly.
 
 ## Main Navigation
 
