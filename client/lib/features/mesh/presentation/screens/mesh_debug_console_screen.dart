@@ -14,7 +14,7 @@ class MeshDebugConsoleScreen extends ConsumerStatefulWidget {
   const MeshDebugConsoleScreen({super.key});
 
   @override
-  State<MeshDebugConsoleScreen> createState() => _MeshDebugConsoleScreenState();
+  ConsumerState<MeshDebugConsoleScreen> createState() => _MeshDebugConsoleScreenState();
 }
 
 class _MeshDebugConsoleScreenState extends ConsumerState<MeshDebugConsoleScreen> {
@@ -26,7 +26,7 @@ class _MeshDebugConsoleScreenState extends ConsumerState<MeshDebugConsoleScreen>
   ];
 
   void _injectTestRelayPacket() {
-    final sync = context.read<SyncService>();
+    final sync = ref.read(syncServiceProvider);
     final testMsg = Message(
       id: 'test-relay-${const Uuid().v4().substring(0, 6)}',
       conversationId: 'conv-simulated',
@@ -61,7 +61,7 @@ class _MeshDebugConsoleScreenState extends ConsumerState<MeshDebugConsoleScreen>
   }
 
   void _injectDuplicatePacket() {
-    final sync = context.read<SyncService>();
+    final sync = ref.read(syncServiceProvider);
     final storage = ref.read(storageServiceProvider);
 
     // Send a packet with an already-seen ID
@@ -96,10 +96,10 @@ class _MeshDebugConsoleScreenState extends ConsumerState<MeshDebugConsoleScreen>
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final connectivity = ref.watch(connectivityServiceProvider);
     final nearby = ref.watch(nearbyDeviceServiceProvider);
-    final sync = context.watch<SyncService>();
+    final sync = ref.watch(syncServiceProvider);
 
     return Scaffold(
       appBar: AppBar(

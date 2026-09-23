@@ -10,7 +10,7 @@ class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
 
   @override
-  State<SettingsScreen> createState() => _SettingsScreenState();
+  ConsumerState<SettingsScreen> createState() => _SettingsScreenState();
 }
 
 class _SettingsScreenState extends ConsumerState<SettingsScreen> {
@@ -73,7 +73,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           _buildSectionHeader('APPEARANCE', AppTheme.primaryEmerald),
           Card(
             color: cardColor,
-            child: Consumer<StorageService>(
+            child: Consumer(
               builder: (context, storage, _) {
                 return SwitchListTile(
                   title: Text('Dark Mode', style: TextStyle(color: textColor)),
@@ -182,7 +182,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.w600),
                   ),
                   onTap: () {
-                    final sync = context.read<SyncService>();
+                    final sync = ref.read(syncServiceProvider);
                     sync.syncPendingQueueToCloud();
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(

@@ -18,7 +18,7 @@ class ChatRoomScreen extends ConsumerStatefulWidget {
   const ChatRoomScreen({super.key, required this.conversationId});
 
   @override
-  State<ChatRoomScreen> createState() => _ChatRoomScreenState();
+  ConsumerState<ChatRoomScreen> createState() => _ChatRoomScreenState();
 }
 
 class _ChatRoomScreenState extends ConsumerState<ChatRoomScreen> {
@@ -86,7 +86,7 @@ class _ChatRoomScreenState extends ConsumerState<ChatRoomScreen> {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final storage = ref.watch(storageServiceProvider);
     final connectivity = ref.watch(connectivityServiceProvider);
     final nearby = ref.watch(nearbyDeviceServiceProvider);

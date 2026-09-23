@@ -12,7 +12,7 @@ class ConversationListScreen extends ConsumerStatefulWidget {
   const ConversationListScreen({super.key});
 
   @override
-  State<ConversationListScreen> createState() => _ConversationListScreenState();
+  ConsumerState<ConversationListScreen> createState() => _ConversationListScreenState();
 }
 
 class _ConversationListScreenState extends ConsumerState<ConversationListScreen> {
@@ -65,8 +65,9 @@ class _ConversationListScreenState extends ConsumerState<ConversationListScreen>
             // Stories Row
             SizedBox(
               height: 100,
-              child: Consumer<StoryServerService>(
-                builder: (context, storyService, child) {
+              child: Consumer(
+                builder: (context, ref, child) {
+                  final storyService = ref.watch(storyServerServiceProvider);
                   final myStory = storyService.myStory;
                   final peerStories = storyService.peerStories.values.toList();
                   

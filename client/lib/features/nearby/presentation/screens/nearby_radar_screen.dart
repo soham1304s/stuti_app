@@ -13,7 +13,7 @@ class NearbyRadarScreen extends ConsumerStatefulWidget {
   const NearbyRadarScreen({super.key});
 
   @override
-  State<NearbyRadarScreen> createState() => _NearbyRadarScreenState();
+  ConsumerState<NearbyRadarScreen> createState() => _NearbyRadarScreenState();
 }
 
 class _NearbyRadarScreenState extends ConsumerState<NearbyRadarScreen>
@@ -55,7 +55,7 @@ class _NearbyRadarScreenState extends ConsumerState<NearbyRadarScreen>
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final nearby = ref.watch(nearbyDeviceServiceProvider);
     final connectivity = ref.watch(connectivityServiceProvider);
     final devices = nearby.devices;
