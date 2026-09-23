@@ -81,10 +81,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     'Toggle dark and light theme',
                     style: TextStyle(fontSize: 12, color: Colors.grey.shade500),
                   ),
-                  value: storage.isDarkMode,
+                  value: ref.watch(storageServiceProvider).isDarkMode,
                   activeTrackColor: AppTheme.primaryEmerald,
                   onChanged: (val) {
-                    storage.toggleTheme();
+                    ref.read(storageServiceProvider).toggleTheme();
                   },
                 );
               },

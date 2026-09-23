@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:meshtalk_client/core/theme/app_theme.dart';
 
-class CallScreen extends StatefulWidget {
+class CallScreen extends ConsumerStatefulWidget {
   final String peerName;
   final String callType; // 'audio' or 'video'
 
@@ -18,7 +18,7 @@ class CallScreen extends StatefulWidget {
   ConsumerState<CallScreen> createState() => _CallScreenState();
 }
 
-class _CallScreenState extends State<CallScreen> {
+class _CallScreenState extends ConsumerState<CallScreen> {
   bool _isMuted = false;
   bool _isSpeakerOn = false;
   bool _isVideoOff = false;
