@@ -6,12 +6,7 @@ import 'package:meshtalk_client/core/navigation/app_router.dart';
 import 'package:meshtalk_client/core/theme/app_theme.dart';
 import 'package:meshtalk_client/app/data/local/drift/database.dart';
 
-// Providers for dependencies
-final databaseProvider = Provider<AppDatabase>((ref) {
-  final db = AppDatabase();
-  ref.onDispose(db.close);
-  return db;
-});
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

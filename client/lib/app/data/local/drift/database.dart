@@ -7,9 +7,11 @@ import 'package:sqlite3/sqlite3.dart';
 import 'package:sqlite3_flutter_libs/sqlite3_flutter_libs.dart';
 import 'tables.dart';
 
+import 'daos.dart';
+
 part 'database.g.dart';
 
-@DriftDatabase(tables: [AppMessages, AppConversations, AppContacts])
+@DriftDatabase(tables: [AppMessages, AppConversations, AppContacts], daos: [AppDao])
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
