@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import '../../domain/repositories/auth_repository.dart';
-import '../../data/repositories/supabase_auth_repository.dart';
+import 'package:meshtalk_client/features/auth/domain/repositories/auth_repository.dart';
+import 'package:meshtalk_client/features/auth/data/repositories/supabase_auth_repository.dart';
 
 part 'auth_provider.g.dart';
 
