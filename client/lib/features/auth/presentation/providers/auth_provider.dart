@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../../data/repositories/supabase_auth_repository.dart';

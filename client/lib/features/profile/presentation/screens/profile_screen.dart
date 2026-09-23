@@ -2,14 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:meshtalk_client/core/theme/app_theme.dart';
 import 'package:meshtalk_client/services/storage_service.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:meshtalk_client/app/providers.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final storage = context.watch<StorageService>();
+  Widget build(BuildContext context, WidgetRef ref) {
+    final storage = ref.watch(storageServiceProvider);
     final user = storage.currentUser;
 
     if (user == null) {
@@ -189,14 +190,14 @@ class ProfileScreen extends StatelessWidget {
   }
 }
 
-class _DetailRow extends StatelessWidget {
+class _DetailRow extends ConsumerWidget {
   final String label;
   final String value;
 
   const _DetailRow({required this.label, required this.value});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: Column(

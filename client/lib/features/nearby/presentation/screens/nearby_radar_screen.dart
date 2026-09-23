@@ -6,16 +6,17 @@ import 'package:meshtalk_client/features/nearby/domain/models/nearby_device.dart
 import 'package:meshtalk_client/services/connectivity_service.dart';
 import 'package:meshtalk_client/services/nearby_device_service.dart';
 import 'package:meshtalk_client/services/storage_service.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:meshtalk_client/app/providers.dart';
 
-class NearbyRadarScreen extends StatefulWidget {
+class NearbyRadarScreen extends ConsumerStatefulWidget {
   const NearbyRadarScreen({super.key});
 
   @override
   State<NearbyRadarScreen> createState() => _NearbyRadarScreenState();
 }
 
-class _NearbyRadarScreenState extends State<NearbyRadarScreen>
+class _NearbyRadarScreenState extends ConsumerState<NearbyRadarScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _pulseController;
 
@@ -29,7 +30,7 @@ class _NearbyRadarScreenState extends State<NearbyRadarScreen>
 
     // Start discovery scan
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<NearbyDeviceService>().startScanning();
+      ref.read(nearbyDeviceServiceProvider).startScanning();
     });
   }
 
@@ -40,7 +41,7 @@ class _NearbyRadarScreenState extends State<NearbyRadarScreen>
   }
 
   void _connectAndOpenChat(NearbyDevice device) {
-    final storage = context.read<StorageService>();
+    final storage = ref.read(storageServiceProvider);
     final conversation = storage.getOrCreateConversationForPeer(
       peerId: device.deviceId,
       peerName: device.name,
@@ -54,9 +55,9 @@ class _NearbyRadarScreenState extends State<NearbyRadarScreen>
   }
 
   @override
-  Widget build(BuildContext context) {
-    final nearby = context.watch<NearbyDeviceService>();
-    final connectivity = context.watch<ConnectivityService>();
+  Widget build(BuildContext context, WidgetRef ref) {
+    final nearby = ref.watch(nearbyDeviceServiceProvider);
+    final connectivity = ref.watch(connectivityServiceProvider);
     final devices = nearby.devices;
 
     return Scaffold(
@@ -238,7 +239,7 @@ class _NearbyRadarScreenState extends State<NearbyRadarScreen>
   }
 }
 
-class _NearbyDeviceCard extends StatelessWidget {
+class _NearbyDeviceCard extends ConsumerWidget {
   final NearbyDevice device;
   final VoidCallback onConnect;
 
@@ -248,7 +249,7 @@ class _NearbyDeviceCard extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Card(
       margin: const EdgeInsets.only(bottom: 10),
       child: Padding(

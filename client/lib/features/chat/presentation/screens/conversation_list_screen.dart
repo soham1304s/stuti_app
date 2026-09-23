@@ -5,16 +5,17 @@ import 'package:meshtalk_client/features/chat/domain/models/conversation.dart';
 import 'package:meshtalk_client/features/chat/domain/models/message.dart';
 import 'package:meshtalk_client/services/storage_service.dart';
 import 'package:meshtalk_client/services/story_server_service.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:meshtalk_client/app/providers.dart';
 
-class ConversationListScreen extends StatefulWidget {
+class ConversationListScreen extends ConsumerStatefulWidget {
   const ConversationListScreen({super.key});
 
   @override
   State<ConversationListScreen> createState() => _ConversationListScreenState();
 }
 
-class _ConversationListScreenState extends State<ConversationListScreen> {
+class _ConversationListScreenState extends ConsumerState<ConversationListScreen> {
   String _searchQuery = '';
 
   @override
@@ -243,7 +244,7 @@ class _ConversationListScreenState extends State<ConversationListScreen> {
           ElevatedButton(
             onPressed: () {
               if (controller.text.trim().isNotEmpty) {
-                final storage = context.read<StorageService>();
+                final storage = ref.read(storageServiceProvider);
                 final name = storage.currentUser?.displayName ?? 'Me';
                 service.postStory(name, controller.text.trim());
               }

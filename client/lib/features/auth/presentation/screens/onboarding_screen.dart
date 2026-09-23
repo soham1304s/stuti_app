@@ -4,16 +4,17 @@ import 'package:meshtalk_client/core/crypto/crypto_helper.dart';
 import 'package:meshtalk_client/core/theme/app_theme.dart';
 import 'package:meshtalk_client/features/auth/domain/models/user_identity.dart';
 import 'package:meshtalk_client/services/storage_service.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:meshtalk_client/app/providers.dart';
 
-class OnboardingScreen extends StatefulWidget {
+class OnboardingScreen extends ConsumerStatefulWidget {
   const OnboardingScreen({super.key});
 
   @override
   State<OnboardingScreen> createState() => _OnboardingScreenState();
 }
 
-class _OnboardingScreenState extends State<OnboardingScreen> {
+class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   final _nameController = TextEditingController(text: 'Soham Mondal');
   final _phoneController = TextEditingController(text: '+91 98765 43210');
   late CryptographicIdentity _identity;
@@ -42,7 +43,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   Future<void> _completeOnboarding() async {
-    final storage = context.read<StorageService>();
+    final storage = ref.read(storageServiceProvider);
     final user = UserIdentity(
       id: _identity.deviceId,
       displayName: _nameController.text.trim().isEmpty

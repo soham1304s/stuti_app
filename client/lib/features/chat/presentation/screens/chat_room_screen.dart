@@ -9,9 +9,10 @@ import 'package:meshtalk_client/services/connectivity_service.dart';
 import 'package:meshtalk_client/services/nearby_device_service.dart';
 import 'package:meshtalk_client/services/storage_service.dart';
 import 'package:meshtalk_client/services/transport_manager.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:meshtalk_client/app/providers.dart';
 
-class ChatRoomScreen extends StatefulWidget {
+class ChatRoomScreen extends ConsumerStatefulWidget {
   final String conversationId;
 
   const ChatRoomScreen({super.key, required this.conversationId});
@@ -20,7 +21,7 @@ class ChatRoomScreen extends StatefulWidget {
   State<ChatRoomScreen> createState() => _ChatRoomScreenState();
 }
 
-class _ChatRoomScreenState extends State<ChatRoomScreen> {
+class _ChatRoomScreenState extends ConsumerState<ChatRoomScreen> {
   final _messageController = TextEditingController();
   final _scrollController = ScrollController();
   bool _isComposing = false;
@@ -49,7 +50,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
     _messageController.clear();
     setState(() => _isComposing = false);
 
-    final transportManager = context.read<TransportManager>();
+    final transportManager = ref.read(transportManagerProvider);
     final result = await transportManager.sendMessage(
       conversationId: conversation.id,
       recipientId: conversation.peerId,
@@ -70,7 +71,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
   }
 
   void _sendSimulatedMedia(Conversation conversation, MessageMediaType type) async {
-    final transportManager = context.read<TransportManager>();
+    final transportManager = ref.read(transportManagerProvider);
     await transportManager.sendMessage(
       conversationId: conversation.id,
       recipientId: conversation.peerId,
@@ -85,11 +86,11 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    final storage = context.watch<StorageService>();
-    final connectivity = context.watch<ConnectivityService>();
-    final nearby = context.watch<NearbyDeviceService>();
-    final transportManager = context.read<TransportManager>();
+  Widget build(BuildContext context, WidgetRef ref) {
+    final storage = ref.watch(storageServiceProvider);
+    final connectivity = ref.watch(connectivityServiceProvider);
+    final nearby = ref.watch(nearbyDeviceServiceProvider);
+    final transportManager = ref.read(transportManagerProvider);
 
     final conversation = storage.getConversationById(widget.conversationId);
     if (conversation == null) {
@@ -412,7 +413,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
   }
 }
 
-class _MessageBubble extends StatelessWidget {
+class _MessageBubble extends ConsumerWidget {
   final Message message;
   final bool isMe;
 
@@ -518,7 +519,7 @@ class _MessageBubble extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final textColor = theme.colorScheme.onSurface;

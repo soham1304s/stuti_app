@@ -6,17 +6,18 @@ import 'package:meshtalk_client/services/connectivity_service.dart';
 import 'package:meshtalk_client/services/nearby_device_service.dart';
 import 'package:meshtalk_client/services/storage_service.dart';
 import 'package:meshtalk_client/services/sync_service.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:meshtalk_client/app/providers.dart';
 import 'package:uuid/uuid.dart';
 
-class MeshDebugConsoleScreen extends StatefulWidget {
+class MeshDebugConsoleScreen extends ConsumerStatefulWidget {
   const MeshDebugConsoleScreen({super.key});
 
   @override
   State<MeshDebugConsoleScreen> createState() => _MeshDebugConsoleScreenState();
 }
 
-class _MeshDebugConsoleScreenState extends State<MeshDebugConsoleScreen> {
+class _MeshDebugConsoleScreenState extends ConsumerState<MeshDebugConsoleScreen> {
   final List<String> _consoleLogs = [
     '[SYSTEM] Node identity initialized (AES-GCM / Ed25519 derivation)',
     '[BLE] Advertising service UUID 0xFD6F (MeshTalk v1)',
@@ -61,7 +62,7 @@ class _MeshDebugConsoleScreenState extends State<MeshDebugConsoleScreen> {
 
   void _injectDuplicatePacket() {
     final sync = context.read<SyncService>();
-    final storage = context.read<StorageService>();
+    final storage = ref.read(storageServiceProvider);
 
     // Send a packet with an already-seen ID
     final duplicateMsg = Message(
@@ -95,9 +96,9 @@ class _MeshDebugConsoleScreenState extends State<MeshDebugConsoleScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    final connectivity = context.watch<ConnectivityService>();
-    final nearby = context.watch<NearbyDeviceService>();
+  Widget build(BuildContext context, WidgetRef ref) {
+    final connectivity = ref.watch(connectivityServiceProvider);
+    final nearby = ref.watch(nearbyDeviceServiceProvider);
     final sync = context.watch<SyncService>();
 
     return Scaffold(
@@ -348,7 +349,7 @@ class _MeshDebugConsoleScreenState extends State<MeshDebugConsoleScreen> {
   }
 }
 
-class _MetricCard extends StatelessWidget {
+class _MetricCard extends ConsumerWidget {
   final String title;
   final String value;
   final Color color;
@@ -362,7 +363,7 @@ class _MetricCard extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(12),
@@ -391,7 +392,7 @@ class _MetricCard extends StatelessWidget {
   }
 }
 
-class _StatItem extends StatelessWidget {
+class _StatItem extends ConsumerWidget {
   final String label;
   final String value;
   final Color color;
@@ -403,7 +404,7 @@ class _StatItem extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Column(
       children: [
         Text(

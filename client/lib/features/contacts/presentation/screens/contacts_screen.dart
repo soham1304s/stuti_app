@@ -3,16 +3,17 @@ import 'package:go_router/go_router.dart';
 import 'package:meshtalk_client/core/theme/app_theme.dart';
 import 'package:meshtalk_client/features/contacts/domain/models/contact.dart';
 import 'package:meshtalk_client/services/storage_service.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:meshtalk_client/app/providers.dart';
 
-class ContactsScreen extends StatefulWidget {
+class ContactsScreen extends ConsumerStatefulWidget {
   const ContactsScreen({super.key});
 
   @override
   State<ContactsScreen> createState() => _ContactsScreenState();
 }
 
-class _ContactsScreenState extends State<ContactsScreen> {
+class _ContactsScreenState extends ConsumerState<ContactsScreen> {
   String _query = '';
 
   void _showFingerprintVerification(BuildContext context, Contact contact) {
@@ -80,7 +81,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
   }
 
   void _openChatWithContact(Contact contact) {
-    final storage = context.read<StorageService>();
+    final storage = ref.read(storageServiceProvider);
     final conversation = storage.getOrCreateConversationForPeer(
       peerId: contact.id,
       peerName: contact.name,
@@ -99,7 +100,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
     final textColor = theme.colorScheme.onSurface;
     final searchBgColor = isDark ? const Color(0xFF2C2C2E) : Colors.grey.shade300;
     
-    final storage = context.watch<StorageService>();
+    final storage = ref.watch(storageServiceProvider);
     final contacts = storage.contacts.where((c) {
       if (_query.isEmpty) return true;
       return c.name.toLowerCase().contains(_query.toLowerCase()) ||
