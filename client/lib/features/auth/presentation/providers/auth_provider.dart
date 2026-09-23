@@ -1,53 +1,47 @@
-import 'package:flutter/foundation.dart';
-import 'package:meshtalk_client/features/auth/domain/repositories/auth_repository.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+import '../../domain/repositories/auth_repository.dart';
+import '../../data/repositories/supabase_auth_repository.dart';
 
-class AuthProvider extends ChangeNotifier {
-  final AuthRepository _authRepository;
-  
-  bool _isLoading = false;
-  String? _userId;
+part 'auth_provider.g.dart';
 
-  bool get isLoading => _isLoading;
-  bool get isAuthenticated => _userId != null;
-  String? get userId => _userId;
+@Riverpod(keepAlive: true)
+AuthRepository authRepository(AuthRepositoryRef ref) {
+  return SupabaseAuthRepository();
+}
 
-  AuthProvider(this._authRepository) {
-    _authRepository.authStateChanges.listen((uid) {
-      _userId = uid;
-      notifyListeners();
-    });
-  }
+@Riverpod(keepAlive: true)
+Stream<String?> authState(AuthStateRef ref) {
+  final repo = ref.watch(authRepositoryProvider);
+  return repo.authStateChanges;
+}
+
+@riverpod
+class AuthController extends _$AuthController {
+  @override
+  FutureOr<void> build() {}
 
   Future<void> signInWithGoogle() async {
-    _setLoading(true);
-    try {
-      await _authRepository.signInWithGoogle();
-    } catch (e) {
-      debugPrint("Error signing in with Google: $e");
-    } finally {
-      _setLoading(false);
-    }
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() => ref.read(authRepositoryProvider).signInWithGoogle());
   }
 
   Future<void> signInWithApple() async {
-    _setLoading(true);
-    try {
-      await _authRepository.signInWithApple();
-    } catch (e) {
-      debugPrint("Error signing in with Apple: $e");
-    } finally {
-      _setLoading(false);
-    }
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() => ref.read(authRepositoryProvider).signInWithApple());
+  }
+  
+  Future<void> signInWithEmail(String email, String password) async {
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() => ref.read(authRepositoryProvider).signInWithEmail(email, password));
+  }
+  
+  Future<void> signUpWithEmail(String email, String password, String name) async {
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() => ref.read(authRepositoryProvider).signUpWithEmail(email, password, name));
   }
 
   Future<void> signOut() async {
-    _setLoading(true);
-    await _authRepository.signOut();
-    _setLoading(false);
-  }
-
-  void _setLoading(bool value) {
-    _isLoading = value;
-    notifyListeners();
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() => ref.read(authRepositoryProvider).signOut());
   }
 }

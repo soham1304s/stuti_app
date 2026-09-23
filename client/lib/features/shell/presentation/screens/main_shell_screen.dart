@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:meshtalk_client/core/constants/app_constants.dart';
 import 'package:meshtalk_client/core/theme/app_theme.dart';
-import 'package:meshtalk_client/services/connectivity_service.dart';
-import 'package:meshtalk_client/services/nearby_device_service.dart';
-import 'package:provider/provider.dart';
+import 'package:meshtalk_client/app/providers.dart';
 
-class MainShellScreen extends StatelessWidget {
+class MainShellScreen extends ConsumerWidget {
   final Widget child;
 
   const MainShellScreen({super.key, required this.child});
@@ -37,7 +36,7 @@ class MainShellScreen extends StatelessWidget {
     }
   }
 
-  void _showNetworkSimulatorSheet(BuildContext context) {
+  void _showNetworkSimulatorSheet(BuildContext context, WidgetRef ref) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -46,8 +45,9 @@ class MainShellScreen extends StatelessWidget {
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (ctx) {
-        return Consumer2<ConnectivityService, NearbyDeviceService>(
-          builder: (context, connectivity, nearby, _) {
+        return Consumer(
+          builder: (context, ref, _) {
+            final connectivity = ref.watch(connectivityServiceProvider);
             return SafeArea(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
@@ -192,41 +192,9 @@ class MainShellScreen extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
-    final connectivity = context.watch<ConnectivityService>();
+  Widget build(BuildContext context, WidgetRef ref) {
+    final connectivity = ref.watch(connectivityServiceProvider);
     final mode = connectivity.currentMode;
-
-    Color bannerColor;
-    Color textColor;
-    IconData bannerIcon;
-    String bannerText;
-
-    switch (mode) {
-      case ConnectivityMode.online:
-        bannerColor = AppTheme.onlineColor.withValues(alpha: 0.15);
-        textColor = const Color(0xFF4ADE80);
-        bannerIcon = Icons.cloud_done;
-        bannerText = 'Online • Mesh Cloud Connected';
-        break;
-      case ConnectivityMode.nearbyMesh:
-        bannerColor = AppTheme.nearbyMeshColor.withValues(alpha: 0.18);
-        textColor = const Color(0xFF60A5FA);
-        bannerIcon = Icons.bluetooth_connected;
-        bannerText = 'Offline Mesh Active • ${connectivity.nearbyPeerCount} peers in range';
-        break;
-      case ConnectivityMode.connecting:
-        bannerColor = AppTheme.connectingColor.withValues(alpha: 0.15);
-        textColor = const Color(0xFFFBBF24);
-        bannerIcon = Icons.sync;
-        bannerText = 'Searching for Nearby Mesh Nodes...';
-        break;
-      case ConnectivityMode.offline:
-        bannerColor = AppTheme.offlineColor.withValues(alpha: 0.15);
-        textColor = const Color(0xFF94A3B8);
-        bannerIcon = Icons.cloud_off;
-        bannerText = 'Completely Offline • Messages will Queue for Relay';
-        break;
-    }
 
     final currentIndex = _calculateSelectedIndex(context);
 
@@ -234,11 +202,6 @@ class MainShellScreen extends StatelessWidget {
       body: SafeArea(
         child: Column(
           children: [
-            // Removed Dynamic Status Banner to match mockup 1:1
-
-
-
-            // Main Child View
             Expanded(child: child),
           ],
         ),
@@ -272,3 +235,4 @@ class MainShellScreen extends StatelessWidget {
     );
   }
 }
+

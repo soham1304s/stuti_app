@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:meshtalk_client/features/auth/presentation/providers/auth_provider.dart';
 import 'package:meshtalk_client/features/auth/presentation/screens/login_screen.dart';
-import 'package:meshtalk_client/features/calls/presentation/screens/calls_list_screen.dart';
-import 'package:go_router/go_router.dart';
 import 'package:meshtalk_client/features/auth/presentation/screens/onboarding_screen.dart';
 import 'package:meshtalk_client/features/calls/presentation/screens/call_screen.dart';
+import 'package:meshtalk_client/features/calls/presentation/screens/calls_list_screen.dart';
 import 'package:meshtalk_client/features/chat/presentation/screens/chat_room_screen.dart';
 import 'package:meshtalk_client/features/chat/presentation/screens/conversation_list_screen.dart';
 import 'package:meshtalk_client/features/contacts/presentation/screens/contacts_screen.dart';
@@ -13,32 +14,27 @@ import 'package:meshtalk_client/features/nearby/presentation/screens/nearby_rada
 import 'package:meshtalk_client/features/profile/presentation/screens/profile_screen.dart';
 import 'package:meshtalk_client/features/settings/presentation/screens/settings_screen.dart';
 import 'package:meshtalk_client/features/shell/presentation/screens/main_shell_screen.dart';
-import 'package:meshtalk_client/services/storage_service.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
 final GlobalKey<NavigatorState> _shellNavigatorKey = GlobalKey<NavigatorState>();
 
-GoRouter createAppRouter(StorageService storageService, AuthProvider authProvider) {
+final appRouterProvider = Provider<GoRouter>((ref) {
+  final authState = ref.watch(authStateProvider);
+
   return GoRouter(
     navigatorKey: _rootNavigatorKey,
-    initialLocation: '/login', // Will be immediately redirected if authenticated
-    refreshListenable: authProvider,
+    initialLocation: '/login',
     redirect: (context, state) {
-      final isFirebaseAuthed = authProvider.isAuthenticated;
-      final hasLocalIdentity = storageService.currentUser != null;
-
+      final isAuthed = authState.value != null;
       final isLoggingIn = state.uri.path == '/login';
       final isOnboarding = state.uri.path == '/onboarding';
 
-      if (!isFirebaseAuthed) {
+      if (!isAuthed) {
         return isLoggingIn ? null : '/login';
       }
 
-      if (isFirebaseAuthed && !hasLocalIdentity) {
-        return isOnboarding ? null : '/onboarding';
-      }
-
-      if (isFirebaseAuthed && hasLocalIdentity && (isLoggingIn || isOnboarding)) {
+      // ponytail: Skip onboarding check for now to simplify
+      if (isAuthed && (isLoggingIn || isOnboarding)) {
         return '/chats';
       }
 
@@ -53,8 +49,6 @@ GoRouter createAppRouter(StorageService storageService, AuthProvider authProvide
         path: '/onboarding',
         builder: (context, state) => const OnboardingScreen(),
       ),
-
-      // Shell Route for Main Application Navigation & Top Banner
       ShellRoute(
         navigatorKey: _shellNavigatorKey,
         builder: (context, state, child) => MainShellScreen(child: child),
@@ -77,8 +71,6 @@ GoRouter createAppRouter(StorageService storageService, AuthProvider authProvide
           ),
         ],
       ),
-
-      // Standalone Full-Screen Routes
       GoRoute(
         path: '/chats/:id',
         parentNavigatorKey: _rootNavigatorKey,
@@ -104,4 +96,4 @@ GoRouter createAppRouter(StorageService storageService, AuthProvider authProvide
       ),
     ],
   );
-}
+});

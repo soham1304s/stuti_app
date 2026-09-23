@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:meshtalk_client/core/theme/app_theme.dart';
 import 'package:meshtalk_client/features/auth/presentation/providers/auth_provider.dart';
-import 'package:provider/provider.dart';
 
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends ConsumerWidget {
   const LoginScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final textColor = theme.colorScheme.onSurface;
-    final authProvider = context.watch<AuthProvider>();
+    
+    final authState = ref.watch(authControllerProvider);
+    final isLoading = authState.isLoading;
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -74,11 +76,11 @@ class LoginScreen extends StatelessWidget {
               const SizedBox(height: 48),
 
               // Buttons
-              if (authProvider.isLoading)
+              if (isLoading)
                 const Center(child: CircularProgressIndicator(color: AppTheme.primaryEmerald))
               else ...[
                 ElevatedButton.icon(
-                  onPressed: () => authProvider.signInWithGoogle(),
+                  onPressed: () => ref.read(authControllerProvider.notifier).signInWithGoogle(),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: isDark ? AppTheme.darkCard : Colors.white,
                     foregroundColor: textColor,
@@ -91,7 +93,7 @@ class LoginScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 16),
                 ElevatedButton.icon(
-                  onPressed: () => authProvider.signInWithApple(),
+                  onPressed: () => ref.read(authControllerProvider.notifier).signInWithApple(),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: isDark ? AppTheme.darkCard : Colors.black,
                     foregroundColor: isDark ? textColor : Colors.white,
