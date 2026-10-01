@@ -15,6 +15,17 @@ class LoginScreen extends ConsumerWidget {
     final authState = ref.watch(authControllerProvider);
     final isLoading = authState.isLoading;
 
+    ref.listen(authControllerProvider, (previous, next) {
+      if (next.hasError && !next.isLoading) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(next.error.toString()),
+            backgroundColor: Colors.redAccent,
+          ),
+        );
+      }
+    });
+
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       body: SafeArea(

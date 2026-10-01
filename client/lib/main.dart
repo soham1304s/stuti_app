@@ -12,10 +12,9 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // Initialize Supabase
-  // ponytail: Use placeholder keys for now, configure later
   await Supabase.initialize(
-    url: 'https://placeholder-project.supabase.co',
-    anonKey: 'placeholder-anon-key',
+    url: 'https://jjidnzkwqwonuspqhjbf.supabase.co',
+    anonKey: 'sb_publishable_IDTBOeUmicLuLX6DD04DIQ_-QdhJpq4',
   );
 
   runApp(

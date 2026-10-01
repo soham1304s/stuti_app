@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'dart:convert';
+import 'package:crypto/crypto.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
@@ -15,9 +17,37 @@ class SupabaseAuthRepository implements AuthRepository {
   }
 
   @override
+  String? get currentUser => _supabase.auth.currentUser?.id;
+
+  Future<void> _ensureProfileExists(User? user) async {
+    if (user == null) return;
+    try {
+      final response = await _supabase
+          .from('profiles')
+          .select('id')
+          .eq('id', user.id)
+          .maybeSingle();
+
+      if (response == null) {
+        // Create profile
+        await _supabase.from('profiles').insert({
+          'id': user.id,
+          'email': user.email ?? '',
+          'display_name': user.userMetadata?['full_name'] ?? user.userMetadata?['name'] ?? 'User',
+          'avatar_url': user.userMetadata?['avatar_url'],
+          'created_at': DateTime.now().toIso8601String(),
+        });
+      }
+    } catch (e) {
+      // Ignore errors for now, or log them
+    }
+  }
+
+  @override
   Future<String?> signInWithGoogle() async {
-    const webClientId = 'my-web-client-id'; // ponytail: placeholder, needs real config
-    const iosClientId = 'my-ios-client-id'; // ponytail: placeholder, needs real config
+    // Note: These must be configured in Google Cloud Console and Supabase Dashboard
+    const webClientId = 'YOUR_WEB_CLIENT_ID.apps.googleusercontent.com';
+    const iosClientId = 'YOUR_IOS_CLIENT_ID.apps.googleusercontent.com';
 
     final GoogleSignIn googleSignIn = GoogleSignIn(
       clientId: iosClientId,
@@ -40,14 +70,15 @@ class SupabaseAuthRepository implements AuthRepository {
       idToken: idToken,
       accessToken: accessToken,
     );
-
+    
+    await _ensureProfileExists(res.user);
     return res.user?.id;
   }
 
   @override
   Future<String?> signInWithApple() async {
-    final rawNonce = 'dummy_nonce';
-    final hashedNonce = 'dummy_hashed_nonce';
+    final rawNonce = _supabase.auth.generateRawNonce();
+    final hashedNonce = sha256.convert(utf8.encode(rawNonce)).toString();
 
     final credential = await SignInWithApple.getAppleIDCredential(
       scopes: [
@@ -68,12 +99,14 @@ class SupabaseAuthRepository implements AuthRepository {
       nonce: rawNonce,
     );
     
+    await _ensureProfileExists(res.user);
     return res.user?.id;
   }
   
   @override
   Future<String?> signInWithEmail(String email, String password) async {
     final res = await _supabase.auth.signInWithPassword(email: email, password: password);
+    await _ensureProfileExists(res.user);
     return res.user?.id;
   }
   
@@ -82,8 +115,9 @@ class SupabaseAuthRepository implements AuthRepository {
     final res = await _supabase.auth.signUp(
       email: email, 
       password: password,
-      data: {'display_name': name},
+      data: {'full_name': name},
     );
+    await _ensureProfileExists(res.user);
     return res.user?.id;
   }
 

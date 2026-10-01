@@ -1,5 +1,6 @@
 abstract class AuthRepository {
   Stream<String?> get authStateChanges;
+  String? get currentUser;
   Future<String?> signInWithGoogle();
   Future<String?> signInWithApple();
   Future<String?> signInWithEmail(String email, String password);

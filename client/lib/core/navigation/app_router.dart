@@ -25,6 +25,14 @@ final appRouterProvider = Provider<GoRouter>((ref) {
     navigatorKey: _rootNavigatorKey,
     initialLocation: '/login',
     redirect: (context, state) {
+      // If the authentication state is loading and we don't have a value yet, 
+      // we shouldn't make a redirect decision. 
+      // However, Supabase auth state is usually available synchronously after init.
+      if (authState.isLoading && !authState.hasValue) {
+        // We could redirect to a splash screen here if we had one.
+        // For now, let it fall through.
+      }
+
       final isAuthed = authState.value != null;
       final isLoggingIn = state.uri.path == '/login';
       final isOnboarding = state.uri.path == '/onboarding';
@@ -33,7 +41,6 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         return isLoggingIn ? null : '/login';
       }
 
-      // ponytail: Skip onboarding check for now to simplify
       if (isAuthed && (isLoggingIn || isOnboarding)) {
         return '/chats';
       }
