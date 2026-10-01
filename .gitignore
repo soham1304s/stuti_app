@@ -11,3 +11,9 @@ Thumbs.db
 # Build Artifacts
 **/build/
 .dart_tool/
+
+# Environment configuration
+client/.env
+client/.env*
+!client/.env.example
+

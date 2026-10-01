@@ -1,20 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:meshtalk_client/core/constants/app_constants.dart';
 import 'package:meshtalk_client/core/navigation/app_router.dart';
 import 'package:meshtalk_client/core/theme/app_theme.dart';
 import 'package:meshtalk_client/app/data/local/drift/database.dart';
 
-
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  
+  // Load environment variables
+  await dotenv.load(fileName: ".env");
 
   // Initialize Supabase
   await Supabase.initialize(
-    url: 'https://jjidnzkwqwonuspqhjbf.supabase.co',
-    anonKey: 'sb_publishable_IDTBOeUmicLuLX6DD04DIQ_-QdhJpq4',
+    url: dotenv.env['SUPABASE_URL'] ?? '',
+    anonKey: dotenv.env['SUPABASE_PUBLISHABLE_KEY'] ?? '',
   );
 
   runApp(

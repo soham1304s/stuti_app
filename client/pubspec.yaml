@@ -45,6 +45,7 @@ dependencies:
   connectivity_plus: ^6.0.3
   provider: ^6.1.5+1
   crypto: ^3.0.7
+  flutter_dotenv: ^6.0.1
 
 dev_dependencies:
   flutter_test:
@@ -58,3 +59,5 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  assets:
+    - .env

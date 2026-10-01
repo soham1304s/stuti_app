@@ -2013,3 +2013,26 @@ The core principle is:
 > **One conversation. Multiple transports. Automatic switching.**
 
 Build the system around this principle from the beginning so that internet messaging, Bluetooth messaging, and future mesh networking remain separate transport implementations behind the same messaging layer.
+
+# 🛠️ Development Environment Setup
+
+To run this project locally, you must configure your environment variables:
+
+1. Clone the repository.
+2. Navigate to the `client/` directory.
+3. Copy the example environment file:
+   ```bash
+   cp .env.example .env
+   ```
+4. Open the `.env` file and provide your local credentials:
+   ```env
+   SUPABASE_URL=your_supabase_url
+   SUPABASE_PUBLISHABLE_KEY=your_supabase_publishable_key
+   ```
+   > **Note:** The `.env` file is git-ignored and should never be committed.
+
+5. Install dependencies and run the application:
+   ```bash
+   flutter pub get
+   flutter run
+   ```
