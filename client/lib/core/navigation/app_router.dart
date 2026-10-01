@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 import 'package:meshtalk_client/features/auth/presentation/providers/auth_provider.dart';
 import 'package:meshtalk_client/features/auth/presentation/screens/login_screen.dart';
 import 'package:meshtalk_client/features/auth/presentation/screens/onboarding_screen.dart';
-import 'package:meshtalk_client/features/calls/presentation/screens/call_screen.dart';
 import 'package:meshtalk_client/features/calls/presentation/screens/calls_list_screen.dart';
 import 'package:meshtalk_client/features/chat/presentation/screens/chat_room_screen.dart';
 import 'package:meshtalk_client/features/chat/presentation/screens/conversation_list_screen.dart';

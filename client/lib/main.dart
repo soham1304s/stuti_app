@@ -5,7 +5,6 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:meshtalk_client/core/constants/app_constants.dart';
 import 'package:meshtalk_client/core/navigation/app_router.dart';
 import 'package:meshtalk_client/core/theme/app_theme.dart';
-import 'package:meshtalk_client/app/data/local/drift/database.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -16,7 +15,7 @@ void main() async {
   // Initialize Supabase
   await Supabase.initialize(
     url: dotenv.env['SUPABASE_URL'] ?? '',
-    anonKey: dotenv.env['SUPABASE_PUBLISHABLE_KEY'] ?? '',
+    publishableKey: dotenv.env['SUPABASE_PUBLISHABLE_KEY'] ?? '',
   );
 
   runApp(
@@ -33,15 +32,12 @@ class MeshTalkApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(appRouterProvider);
 
-    // ponytail: Simplification, listen to theme provider when implemented
-    const isDarkMode = true;
-
     return MaterialApp.router(
       title: AppConstants.appName,
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
-      themeMode: isDarkMode ? ThemeMode.dark : ThemeMode.light,
+      themeMode: ThemeMode.system,
       routerConfig: router,
     );
   }

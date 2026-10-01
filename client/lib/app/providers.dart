@@ -19,7 +19,6 @@ final databaseProvider = Provider<AppDatabase>((ref) {
 final storageServiceProvider = ChangeNotifierProvider<StorageService>((ref) {
   final db = ref.watch(databaseProvider);
   final service = StorageService(db: db);
-  // ponytail: async initialization should be awaited, but we keep it synchronous for UI simplicity here
   service.initialize();
   return service;
 });

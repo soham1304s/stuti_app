@@ -1,9 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:meshtalk_client/core/theme/app_theme.dart';
-import 'package:meshtalk_client/features/chat/domain/models/conversation.dart';
-import 'package:meshtalk_client/features/chat/domain/models/message.dart';
-import 'package:meshtalk_client/services/storage_service.dart';
 import 'package:meshtalk_client/services/story_server_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:meshtalk_client/app/providers.dart';
@@ -16,7 +12,6 @@ class ConversationListScreen extends ConsumerStatefulWidget {
 }
 
 class _ConversationListScreenState extends ConsumerState<ConversationListScreen> {
-  String _searchQuery = '';
 
   @override
   Widget build(BuildContext context) {
@@ -131,7 +126,7 @@ class _ConversationListScreenState extends ConsumerState<ConversationListScreen>
                   hintStyle: const TextStyle(color: Colors.grey),
                 ),
                 style: TextStyle(color: textColor),
-                onChanged: (val) => setState(() => _searchQuery = val),
+                onChanged: (val) {},
               ),
             ),
 

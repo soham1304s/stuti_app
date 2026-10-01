@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:meshtalk_client/core/theme/app_theme.dart';
-import 'package:meshtalk_client/services/storage_service.dart';
-import 'package:meshtalk_client/services/sync_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:meshtalk_client/app/providers.dart';
 
@@ -17,7 +15,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   bool _enableStoreAndForwardRelay = true;
   bool _batteryOptimization = true;
   String _scanMode = 'Adaptive';
-  final int _maxHops = 8;
+
   int _cacheTtlHours = 24;
 
   @override

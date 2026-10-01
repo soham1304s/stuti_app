@@ -5,10 +5,6 @@ import 'package:meshtalk_client/core/theme/app_theme.dart';
 import 'package:meshtalk_client/core/utils/date_formatter.dart';
 import 'package:meshtalk_client/features/chat/domain/models/conversation.dart';
 import 'package:meshtalk_client/features/chat/domain/models/message.dart';
-import 'package:meshtalk_client/services/connectivity_service.dart';
-import 'package:meshtalk_client/services/nearby_device_service.dart';
-import 'package:meshtalk_client/services/storage_service.dart';
-import 'package:meshtalk_client/services/transport_manager.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:meshtalk_client/app/providers.dart';
 

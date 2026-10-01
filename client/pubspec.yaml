@@ -47,6 +47,7 @@ dependencies:
   crypto: ^3.0.7
   flutter_dotenv: ^6.0.1
 
+  sqlite3: any
 dev_dependencies:
   flutter_test:
     sdk: flutter

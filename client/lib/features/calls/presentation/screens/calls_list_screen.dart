@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:meshtalk_client/core/theme/app_theme.dart';
 
 class CallsListScreen extends StatelessWidget {

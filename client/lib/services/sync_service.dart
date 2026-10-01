@@ -5,7 +5,6 @@ import 'package:meshtalk_client/core/constants/app_constants.dart';
 import 'package:meshtalk_client/features/chat/domain/models/message.dart';
 import 'package:meshtalk_client/services/connectivity_service.dart';
 import 'package:meshtalk_client/services/storage_service.dart';
-import 'package:meshtalk_client/app/data/local/drift/daos.dart';
 import 'package:meshtalk_client/app/data/local/drift/database.dart';
 
 class SyncService extends ChangeNotifier {
@@ -36,7 +35,6 @@ class SyncService extends ChangeNotifier {
     required this.storageService,
     required this.connectivityService,
   }) {
-    // ponytail: we are cutting a corner here by doing simple one-way sync and realtime subscriptions, 
     // ceiling: full CRDT or sync token based reconciliation for robust offline-first.
     _initSupabaseSync();
   }
@@ -61,7 +59,6 @@ class SyncService extends ChangeNotifier {
     ).subscribe();
 
     // Listen to local pending messages to push
-    // ponytail: a polling approach or a robust background task queue is better here.
     _pendingMessagesSub = storageService.dao.watchPendingMessages().listen((messages) {
       if (connectivityService.currentMode == ConnectivityMode.online) {
         _pushPendingMessages(messages);
@@ -70,7 +67,6 @@ class SyncService extends ChangeNotifier {
   }
   
   Future<void> _handleIncomingCloudMessage(Map<String, dynamic> record) async {
-    // ponytail: mapping directly here
     final msg = AppMessage(
       id: record['id'] as String,
       conversationId: record['conversation_id'] as String,
@@ -105,7 +101,7 @@ class SyncService extends ChangeNotifier {
         });
         await storageService.dao.updateMessageStatus(m.id, 'sent');
       } catch (e) {
-        print('Error pushing message: ');
+        debugPrint('Error pushing message: $e');
       }
     }
   }

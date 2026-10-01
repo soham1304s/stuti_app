@@ -27,7 +27,7 @@ class Story {
 class StoryServerService extends ChangeNotifier {
   HttpServer? _server;
   Story? _myStory;
-  int _port = 8081;
+  final int _port = 8081;
 
   final Map<String, Story> _peerStories = {};
 
